@@ -20,8 +20,9 @@ Two parts, built from this source:
 - **No network code at all.** Search the source for sockets, WinHTTP, `HttpClient`, `WebClient` or URLs: there are
   none besides XML namespaces. The app does not check for updates, send telemetry or download anything.
 - It does not read or write browser data, saved passwords, tokens, the Steam account or any file outside the game
-  folder, the app's own folder and the user's temp folder (`gui/Core/Runtime.cs` writes and deletes one temporary file
-  to read the runtime's version).
+  folder, the app's own settings folder and the user's temp folder. The app keeps its own settings (for example the
+  chosen game folder) in `%AppData%\ZARModManager\settings.json` (`gui/Core/Game.cs`), and `gui/Core/Runtime.cs` writes
+  and deletes one temporary file to read the runtime's version.
 - Files the runtime writes, all inside `<game folder>\ZAMods\`: `loader.log` (its own log), one `<mod>.settings` file
   per mod (the setting values), `classes.txt` and `schema.txt` (class and field names of the game's own code, written at
   start-up), and, only if the user presses the debug keys F8 or F9, a snapshot or entity report (`src/loader.cpp`).
