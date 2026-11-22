@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ZARModManager: the desktop front end (WPF). It finds Zombie Assault: Resurgence through Steam, installs / updates the
+       loader runtime (embedded below) into the game folder, manages mods (.lua) and launches the game.
+       Development builds use the installed .NET 9 runtime; releases are published self-contained, as a single
+       file, by publish.cmd. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>ZARModManager</AssemblyName>
+    <RootNamespace>ZARModManager</RootNamespace>
+    <!-- one version for the app and the runtime: the VERSION file at the project root -->
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)..\VERSION').Trim())</Version>
+    <Product>ZARModManager</Product>
+    <Description>Mod loader for Zombie Assault: Resurgence</Description>
+    <ApplicationIcon>Assets\zaloader.ico</ApplicationIcon>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile Condition="'$(SelfContained)' == 'true'">true</EnableCompressionInSingleFile>
+    <!-- release builds carry no debug-symbol reference: it would record the build machine's folder (its user name) in
+         the exe; and any path the compiler does record is mapped to a neutral one -->
+    <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
+    <DebugSymbols Condition="'$(Configuration)' == 'Release'">false</DebugSymbols>
+    <PathMap>$(MSBuildProjectDirectory)=\_\</PathMap>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- the loader runtime (built by build.cmd) and the bundled sample mods, shipped inside the exe -->
+    <EmbeddedResource Include="..\build\version.dll" LogicalName="runtime/ZARModManagerRuntime.dll" Condition="Exists('..\build\version.dll')" />
+    <!-- the mods ship inside development builds; a release (publish.cmd: BundleMods=false) leaves them out, as each
+         mod is downloaded from its own page, and a copy inside the app would offer its own version as an "update" -->
+    <EmbeddedResource Include="..\mods\*.lua" LogicalName="mods/%(Filename)%(Extension)" Condition="'$(BundleMods)' != 'false'" />
+    <Resource Include="Assets\zaloader.ico" />
+  </ItemGroup>
+
+</Project>
